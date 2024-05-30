@@ -96,4 +96,47 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/leaveApplication", async (req, res) => {
+  const { userID, leaveType, startDate, endDate, leaveReason } = req.body;
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  const timeDifference = end.getTime() - start.getTime();
+  const daysDifference = timeDifference / (1000 * 3600 * 24);
+  const positiveDaysDifference = Math.abs(daysDifference);
+
+  const getUserID = async (userID) => {
+    const user = await client
+      .db("lunu1")
+      .collection("usersDetails")
+      .findOne({ userID: userID });
+    return user;
+  };
+
+  const user = await getUserID(userID);
+
+  await client.db("lunu1").collection("leaveApplication").insertOne({
+    userID,
+    leaveType,
+    startDate,
+    endDate,
+    leaveReason,
+    positiveDaysDifference,
+  });
+
+  await client
+    .db("lunu1")
+    .collection("usersDetails")
+    .updateOne(
+      { userID: userID },
+      { $set: { permissions: user.permissions - positiveDaysDifference } } // Access permissions from the user object
+    );
+
+  res.status(200).send({
+    status: 1,
+    message: "Successfully permission updated!",
+  });
+});
+
 app.listen(PORT, () => console.log(`The port is running on ${PORT}`));
