@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 import { MongoClient } from "mongodb";
 const app = express();
@@ -9,6 +10,7 @@ const client = new MongoClient(URL);
 client.connect();
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("hello world");
