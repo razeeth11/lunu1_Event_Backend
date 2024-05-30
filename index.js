@@ -4,9 +4,9 @@ import { MongoClient } from "mongodb";
 const app = express();
 const PORT = 4000;
 
-const URL = "mongodb+srv://lunu:lunu1234@cluster0.mxmqnga.mongodb.net/";
+const MONGO_URL = "mongodb+srv://lunu:lunu1234@cluster0.mxmqnga.mongodb.net/";
 
-const client = new MongoClient(URL);
+const client = new MongoClient(MONGO_URL);
 client.connect();
 
 app.use(express.json());
@@ -14,6 +14,10 @@ app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("hello world");
+});
+
+app.get("/mapla", (req, res) => {
+  res.send("hello mapla");
 });
 
 app.post("/signup", async (req, res) => {
