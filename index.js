@@ -2,11 +2,12 @@ import bcrypt from "bcryptjs";
 import cors from "cors";
 import * as dotenv from "dotenv";
 import express from "express";
+import jwt from "jsonwebtoken";
 import { MongoClient } from "mongodb";
 dotenv.config();
 const app = express();
 const PORT = 4000;
-
+const secretKey = process.env.SECRET_KEY;
 const MONGO_URL = process.env.MONGO_URL;
 
 const client = new MongoClient(MONGO_URL);
@@ -47,6 +48,7 @@ app.post("/signup", async (req, res) => {
         email: email,
         password: hashedPassword,
         userID: userID,
+        permissions : 21
       });
     const result1 = await client.db("lunu1").collection(`${userID}`).insertOne({
       username: username,
@@ -59,7 +61,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.post("/login",async (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   const getUserEmail = async (email) => {
@@ -72,18 +74,26 @@ app.post("/login",async (req, res) => {
 
   const userEmail = await getUserEmail(email);
 
-  if(userEmail){
+  if (userEmail) {
     const isPasswordValid = await bcrypt.compare(password, userEmail.password);
-    if(isPasswordValid){
-      res.send({status : 1 , message : "Successfully logged in"}).status(200)
-    }else {
-      res.status(400).send({ status: 0, message: 'Invalid Credentials or Please signup' });
+    if (isPasswordValid) {
+      const token = jwt.sign({ userID: userEmail.userID }, secretKey, {
+        expiresIn: "1h",
+      });
+      res
+        .send({
+          status: 1,
+          message: "Successfully logged in",
+          userID: userEmail.userID,
+          token,
+        })
+        .status(200);
+    } else {
+      res.status(400).send({ status: 0, message: "Invalid Credentials" });
     }
-  }else {
-    res.status(400).send({ status: 0, message: 'User does not exist' });
+  } else {
+    res.status(400).send({ status: 0, message: "User does not exist" });
   }
-
-  
 });
 
 app.listen(PORT, () => console.log(`The port is running on ${PORT}`));
