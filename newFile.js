@@ -9,7 +9,7 @@ import {
   signupUser,
   updateLeavePermissions
 } from "./findUserByEmail.js";
-import { client, secretKey } from "./index.js";
+import { client, SECRET_KEY } from "./index.js";
 
 const router = express.Router();
 
@@ -44,7 +44,7 @@ router.post("/login", async (req, res) => {
   if (userEmail) {
     const isPasswordValid = await bcrypt.compare(password, userEmail.password);
     if (isPasswordValid) {
-      const token = jwt.sign({ userID: userEmail.userID }, secretKey, {
+      const token = jwt.sign({ userID: userEmail.userID }, SECRET_KEY, {
         expiresIn: "1h",
       });
       res

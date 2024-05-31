@@ -6,7 +6,7 @@ import router from "./newFile.js";
 dotenv.config();
 export const app = express();
 const PORT = 4000;
-export const secretKey = process.env.SECRET_KEY;
+export const SECRET_KEY = process.env.SECRET_KEY;
 const MONGO_URL = process.env.MONGO_URL;
 
 
