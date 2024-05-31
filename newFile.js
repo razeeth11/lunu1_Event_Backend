@@ -9,7 +9,7 @@ import {
   signupUser,
   updateLeavePermissions
 } from "./findUserByEmail.js";
-import { secretKey } from "./index.js";
+import { client, secretKey } from "./index.js";
 
 const router = express.Router();
 
@@ -91,6 +91,35 @@ router.post("/leaveApplication", async (req, res) => {
     status: 1,
     message: "Successfully permission updated!",
   });
+});
+
+
+router.get("/leaveApplicationHistory/:userID", async (req, res) => {
+  const { userID } = req.params;
+
+  const leaveHistory = await client
+    .db("lunu1")
+    .collection("leaveApplication")
+    .find({})
+    .toArray();
+
+  const result = leaveHistory.filter((item) => item.userID == userID);
+
+  res.send({status : 1 , leaveHistory : result});
+});
+
+router.get("/userDetail/:userID", async (req, res) => {
+  const { userID } = req.params;
+
+  const leaveHistory = await client
+    .db("lunu1")
+    .collection("usersDetails")
+    .find({})
+    .toArray();
+
+  const result = leaveHistory.filter((item) => item.userID == userID);
+
+  res.send({status : 1 , leaveHistory : result});
 });
 
 export default router;

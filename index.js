@@ -9,8 +9,25 @@ const PORT = 4000;
 export const secretKey = process.env.SECRET_KEY;
 const MONGO_URL = process.env.MONGO_URL;
 
-export const client = new MongoClient(MONGO_URL);
-client.connect();
+
+export let client;
+
+async function initializeMongoClient() {
+  try {
+    client = new MongoClient(MONGO_URL);
+    await client.connect();
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error("Failed to connect to MongoDB", error);
+    process.exit(1);  // Exit process if the connection fails
+  }
+}
+
+initializeMongoClient();
+
+
+// export const client = new MongoClient(MONGO_URL);
+// client.connect();
 
 app.use(express.json());
 app.use(cors());
